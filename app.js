@@ -31,14 +31,15 @@ app.get('/v1/news', (req, res) => {
     //Need to summerize data to be short and consise to return back
     axios.get(url)
         .then(response => {
-           //console.log(response.data.totalResults); 
 
+           //Push summerized data into global array
            for(var i = 0; i < response.data.totalResults; i++){
                summarizeLink(response.data.articles[i].url, (data) => {
                     apiObjList.push(data);
-                    //console.log(data);
+                    console.log(data);
                });
 
+               //TODO: Fix async issue with sending final array 
                 if(i == 20){
                     console.log(i);
                     res.send(apiObjList);
