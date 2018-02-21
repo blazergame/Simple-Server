@@ -5,5 +5,11 @@
     "api": {
         "NewsAPI": "https://newsapi.org/v2/top-headlines?",
         "NewsAPIKey": "ba8dbbf0df714f6da7370f626a0dbc8d"
+    },
+    "db": {
+        "apiKey": "AIzaSyAaPyMJnq-CFZq185HXi-7cViGKztQLzOE",
+        "authDomain": "simple-server-811b2.firebaseapp.com",
+        "databaseURL": "https://simple-server-811b2.firebaseio.com/",
+        "storageBucket": "simple-server-811b2.appspot.com"
     }
 }

@@ -11,7 +11,6 @@ app.get('/', (req, res) => {
     res.send("Hello World!");
 });
 
-
 app.get('/v1/news', NewsAPI);
 
 

@@ -7,6 +7,7 @@ const config = require('../Config/config.json');
 //DB
 var firebase = require('firebase');
 
+
 //API Related 
 const NewsAPI = config.api.NewsAPI;
 const country = 'us';
@@ -15,13 +16,48 @@ const apiKey = config.api.NewsAPIKey;
 
 const url = NewsAPI + 'country=' + country + '&' + 'category=' + category + '&' + 'apiKey=' + apiKey;
 
-//Store api into db, query and summarize
+//Initialize firebase
 firebase.initializeApp({
-  
+    apiKey: config.db.apiKey,
+    authDomain: config.db.authDomain,
+    databaseURL: config.db.databaseURL,
+    storageBucket: config.db.storageBucket
 });
 
+var db = firebase.database();
 
+function initializeDB(){
+
+    var connectedRef = db.ref(".info/connected");
+    connectedRef.on("value", function(snap) {
+      if (snap.val() === true) {
+        console.log("Database is connected");
+      } else {
+        console.log("Database is not connected");
+      }
+    });
+
+}
+
+
+//TODO: 
+//Test querying db
+//Insert news api into db
+//Query, summarize and return to res
 function getNewsApi(req, res) {
+
+    //Check if db is connected
+    //initializeDB();
+  
+    //Insert into db route /usrs/1 -> {email: 'test@gmail.com, username: 'benson'}
+    db.ref('/usrs/' +  3).set({
+        username: 'bensonaaa',
+        email: 'test@gmail.com'
+    });
+
+    db.ref('/usrs/3').once('value').then((snap) => {
+        console.log(snap.val());
+    })  
 
     axios.get(url)
         .then(response => {
@@ -31,7 +67,7 @@ function getNewsApi(req, res) {
            for(var i = 0; i < response.data.totalResults; i++){
                summarizeLink(response.data.articles[i].url, (data) => {
                     //apiObjList.append(data);
-                    console.log(data);
+                    //console.log(data);
                     res.send(data);
                });
            }

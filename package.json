@@ -6,8 +6,8 @@
   "dependencies": {
     "axios": "^0.17.1",
     "express": "^4.16.2",
+    "firebase": "^4.10.0",
     "lodash-node": "^2.4.1",
-    "request": "^2.83.0",
     "summarizer": "^1.0.0"
   },
   "devDependencies": {},
