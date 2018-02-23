@@ -90,7 +90,7 @@ function getNewsApi(req, res) {
             });
 
             //Send query of summarized api 
-            db.ref('/summarizedArticles').on('value', (snap) => {
+            db.ref('/summarizedArticles').once('value', (snap) => {
                 res.send(snap.val());
             })
             
