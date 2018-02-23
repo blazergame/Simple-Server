@@ -14,8 +14,6 @@ app.get('/', (req, res) => {
 app.get('/v1/news', NewsAPI);
 
 
-
-
 app.listen(port, () => {
     console.log("Current listening on port: " + port);
 });

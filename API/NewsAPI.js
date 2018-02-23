@@ -32,70 +32,73 @@ function initializeDB(){
     connectedRef.on("value", function(snap) {
       if (snap.val() === true) {
         console.log("Database is connected");
-      } else {
-        console.log("Database is not connected");
-      }
+      } 
     });
 
 }
 
+//Initialize Database for connection
+initializeDB();
 
-//TODO: 
-//Test querying db
-//Insert news api into db
-//Query, summarize and return to res
+
+/**************************************************************************************
+Fetches the News API, run it through a summarizer and return summarized api data
+
+    snapObj = {
+        id: 1
+        title: some title
+        description some description
+        url: www.someurl.com
+        topics: [topicA,topicB,topicD]
+        readTimeMinutes: 5
+        image: www.someurl.com/image1
+        summary: summary text body
+    }
+**************************************************************************************/
 function getNewsApi(req, res) {
 
-    //Check if db is connected
-    //initializeDB();
-  
-    //Insert into db route /usrs/1 -> {email: 'test@gmail.com, username: 'benson'}
-    db.ref('/usrs/' +  3).set({
-        username: 'bensonaaa',
-        email: 'test@gmail.com'
-    });
-
-    db.ref('/usrs/3').once('value').then((snap) => {
-        console.log(snap.val());
-    })  
-
     axios.get(url)
-        .then(response => {
+        .then( (response) => {
 
-          // console.log(response.data);
-           //Push summerized data into global array
-           for(var i = 0; i < response.data.totalResults; i++){
-               summarizeLink(response.data.articles[i].url, (data) => {
-                    //apiObjList.append(data);
-                    //console.log(data);
-                    res.send(data);
-               });
-           }
+            //Inserts all api data into it's own sub branch
+            for(var i = 0; i < response.data.totalResults; i++){
+                db.ref('/articles/' + i).set({
+                    articles: response.data.articles[i]
+                })
+            }
+
+
+            //Retrieving api data from db
+            db.ref('/articles').once('value', (snap) => {
+                snap.forEach((snapData) => {                   
+                    
+                    //Summarize url & insert into db
+                    summerize(snapData.val().articles.url)
+                        .then(summerizedData => {
+                            db.ref('/summarizedArticles/' + snapData.key).set({
+                                id : snapData.key,
+                                title : summerizedData.title,
+                                description : summerizedData.description,
+                                url : summerizedData.canonicalLink,
+                                topics : summerizedData.stats.topics,
+                                readTimeMinutes : summerizedData.stats.minutes,
+                                image : summerizedData.image,
+                                summary : summerizedData.summary,
+                            });
+                        });
+                });
+            });
+
+            //Send query of summarized api 
+            db.ref('/summarizedArticles').on('value', (snap) => {
+                res.send(snap.val());
+            })
             
         })
         .catch(error => {
             console.log(error.response);
         });
 
-}
-
-
-function summarizeLink(url, cb){
-
-    summerize(url)
-        .then(data => {
-
-            var apiObj = {
-                title : data.title,
-                // description : data.description,
-                // url : data.canonicalLink,
-                // topics : data.stats.topics,
-                // readTimeMinutes : data.stats.minutes,
-                // image : data.image,
-                // summary : data.summary
-            }
-            cb(apiObj);
-        })
 }
 
 module.exports = getNewsApi;
